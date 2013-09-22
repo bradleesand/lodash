@@ -2830,23 +2830,23 @@
      * // => { 'name': 'moe' }
      */
     function omit(object, callback, thisArg) {
-      var indexOf = getIndexOf(),
-          isFunc = typeof callback == 'function',
+      var isFunc = typeof callback == 'function',
           result = {};
 
       if (isFunc) {
         callback = lodash.createCallback(callback, thisArg, 3);
+        forIn(object, function(value, key, object) {
+          if (!callback(value, key, object)) {
+            result[key] = value;
+          }
+        });
       } else {
         var props = baseFlatten(arguments, true, false, 1);
+        result = clone(object);
+        forIn(props, function(value, key, object) {
+          delete object[value];
+        });
       }
-      forIn(object, function(value, key, object) {
-        if (isFunc
-              ? !callback(value, key, object)
-              : indexOf(props, key) < 0
-            ) {
-          result[key] = value;
-        }
-      });
       return result;
     }
 
